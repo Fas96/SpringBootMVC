@@ -4,11 +4,10 @@ import com.fas.SpringBootMVC.database.PersonRepo;
 import com.fas.SpringBootMVC.model.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,11 +29,8 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/addPerson")
-    public String  addPerson(Person person){
-        personRepo.save(person);
-        return "home";
-    }
+
+
 
     @GetMapping("/getPerson")
     public ModelAndView  getPerson(String name){
@@ -48,17 +44,55 @@ public class HomeController {
         mv.addObject("person",person);
         return mv;
     }
-    @GetMapping("/persons")
+    @GetMapping(path="/persons")
     @ResponseBody
-    public String listPersons() {
-        List<Person> persons = new ArrayList<Person>();
-        personRepo.findAll().forEach(per->persons.add(per));
-        StringBuilder sb = new StringBuilder();
-        for(Person p:persons){
-            sb.append("\nPerson id: "+p.getPid()+"Person name: "+p.getName()+"Person age:  "+p.getAge()+"\n");
-            sb.append("\n");
-        }
+    public List<Person> listPersons() {
+//        List<Person> persons = new ArrayList<Person>();
+//        personRepo.findAll().forEach(per->persons.add(per));
+//        StringBuilder sb = new StringBuilder();
+//        for(Person p:persons){
+//            sb.append("\nPerson id: "+p.getPid()+"Person name: "+p.getName()+"Person age:  "+p.getAge()+"\n");
+//            sb.append("\n");
+//        }
 //        return personRepo.findAll().toString();
-        return sb.toString();
+        return personRepo.findAll();
     }
+    @GetMapping("/persons/{pid}")
+    @ResponseBody
+    public Optional<Person> listPerson(@PathVariable("pid") int pid) {
+        Optional<Person> p=Optional.of(personRepo.findById(pid)).get();
+
+        return p;
+    }
+
+    @DeleteMapping("/persons/{pid}")
+    @ResponseBody
+    public String deletePerson(@PathVariable("pid") int pid) {
+       // Optional<Person> p=Optional.of(personRepo.findById(pid)).get();
+        Person pe = personRepo.getById(pid);
+       // delete the found item
+        personRepo.delete(pe);
+
+        return "deleted";
+    }
+
+  @GetMapping("/addPerson")
+    public String  addPerso(Person person){
+        personRepo.save(person);
+        return "home";
+    }
+
+    @PostMapping("/addPerson")
+    @ResponseBody
+    public Person  addPerson(@RequestBody Person person){
+        personRepo.save(person);
+        return person;
+    }
+    @PutMapping("/addPerson")
+    public String  UpdateOrSavePerson(Person person){
+        personRepo.save(person);
+        return "home";
+    }
+
+
 }
