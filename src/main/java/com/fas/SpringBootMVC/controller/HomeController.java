@@ -5,8 +5,10 @@ import com.fas.SpringBootMVC.model.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,5 +47,18 @@ public class HomeController {
         System.out.println("-----------------------------------------");
         mv.addObject("person",person);
         return mv;
+    }
+    @GetMapping("/persons")
+    @ResponseBody
+    public String listPersons() {
+        List<Person> persons = new ArrayList<Person>();
+        personRepo.findAll().forEach(per->persons.add(per));
+        StringBuilder sb = new StringBuilder();
+        for(Person p:persons){
+            sb.append("\nPerson id: "+p.getPid()+"Person name: "+p.getName()+"Person age:  "+p.getAge()+"\n");
+            sb.append("\n");
+        }
+//        return personRepo.findAll().toString();
+        return sb.toString();
     }
 }
